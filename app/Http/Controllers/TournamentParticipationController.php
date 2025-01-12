@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\TournamentRequest;
 use App\Http\Resources\TournamentResource;
 use App\Models\Tournament;
+use http\Client\Curl\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -14,7 +15,7 @@ class TournamentParticipationController
     public function join(Tournament $tournament): JsonResponse
     {
         DB::transaction(function () use ($tournament) {
-            $user = Auth::user();
+            $user = \App\Models\User::query()->lockForUpdate()->find(Auth::id());
 
             if ($user->balance < $tournament->entry_fee) {
                 throw new \Exception('Insufficient balance');
